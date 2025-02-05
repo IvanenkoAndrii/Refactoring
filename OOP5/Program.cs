@@ -87,6 +87,21 @@ class Program
         }
     }
 
+    private static bool IsValidYear(int year)
+    {
+        return year > 1900 && year <= DateTime.Now.Year;
+    }
+
+    private static bool IsValidMonth(int month)
+    {
+        return month >= 1 && month <= 12;
+    }
+
+    private static bool IsValidSalary(double salary)
+    {
+        return salary > 0;
+    }
+
     public static Worker[] ReadWorkersArray(int n)
     {
         Worker[] workers = new Worker[n];
@@ -98,9 +113,32 @@ class Program
             Console.Write("Прізвище та ініціали: ");
             string name = Console.ReadLine();
 
-            int year = GetValidInput("Рік початку роботи: ", int.Parse, year => year > 1900 && year <= DateTime.Now.Year, "Помилка! Введіть коректний рік.");
-            int month = GetValidInput("Місяць початку роботи: ", int.Parse, month => month >= 1 && month <= 12, "Помилка! Введіть число від 1 до 12.");
-            double salary = GetValidInput("Зарплата: ", double.Parse, salary => salary > 0, "Помилка! Введіть позитивне число.");
+            int year;
+            while (true)
+            {
+                Console.Write("Рік початку роботи: ");
+                if (int.TryParse(Console.ReadLine(), out year) && IsValidYear(year))
+                    break;
+                Console.WriteLine("Помилка! Введіть коректний рік.");
+            }
+
+            int month;
+            while (true)
+            {
+                Console.Write("Місяць початку роботи: ");
+                if (int.TryParse(Console.ReadLine(), out month) && IsValidMonth(month))
+                    break;
+                Console.WriteLine("Помилка! Введіть число від 1 до 12.");
+            }
+
+            double salary;
+            while (true)
+            {
+                Console.Write("Зарплата: ");
+                if (double.TryParse(Console.ReadLine(), out salary) && IsValidSalary(salary))
+                    break;
+                Console.WriteLine("Помилка! Введіть позитивне число.");
+            }
 
             Console.Write("Назва компанії: ");
             string companyName = Console.ReadLine();
@@ -114,7 +152,6 @@ class Program
 
         return workers;
     }
-
 
     public static void PrintWorker(Worker worker)
     {
