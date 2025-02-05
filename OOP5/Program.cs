@@ -73,6 +73,35 @@ class Company
 
 class Program
 {
+    private static T GetValidInput<T>(string prompt, Func<string, T> parser, Func<T, bool> validator, string errorMessage)
+    {
+        T input;
+        while (true)
+        {
+            Console.Write(prompt);
+            string userInput = Console.ReadLine();
+            if (parser(userInput) is T value && validator(value))
+                return value;
+
+            Console.WriteLine(errorMessage);
+        }
+    }
+
+    private static bool IsValidYear(int year)
+    {
+        return year > 1900 && year <= DateTime.Now.Year;
+    }
+
+    private static bool IsValidMonth(int month)
+    {
+        return month >= 1 && month <= 12;
+    }
+
+    private static bool IsValidSalary(double salary)
+    {
+        return salary > 0;
+    }
+
     public static Worker[] ReadWorkersArray(int n)
     {
         Worker[] workers = new Worker[n];
@@ -88,18 +117,27 @@ class Program
             while (true)
             {
                 Console.Write("Рік початку роботи: ");
-                if (int.TryParse(Console.ReadLine(), out year) && year > 1900 && year <= DateTime.Now.Year)
+                if (int.TryParse(Console.ReadLine(), out year) && IsValidYear(year))
                     break;
-                Console.WriteLine("Помилка! Введіть коректний рік (не раніше 1900 і не пізніше поточного року).");
+                Console.WriteLine("Помилка! Введіть коректний рік.");
             }
 
             int month;
             while (true)
             {
                 Console.Write("Місяць початку роботи: ");
-                if (int.TryParse(Console.ReadLine(), out month) && month >= 1 && month <= 12)
+                if (int.TryParse(Console.ReadLine(), out month) && IsValidMonth(month))
                     break;
                 Console.WriteLine("Помилка! Введіть число від 1 до 12.");
+            }
+
+            double salary;
+            while (true)
+            {
+                Console.Write("Зарплата: ");
+                if (double.TryParse(Console.ReadLine(), out salary) && IsValidSalary(salary))
+                    break;
+                Console.WriteLine("Помилка! Введіть позитивне число.");
             }
 
             Console.Write("Назва компанії: ");
@@ -107,15 +145,6 @@ class Program
 
             Console.Write("Посада: ");
             string position = Console.ReadLine();
-
-            double salary;
-            while (true)
-            {
-                Console.Write("Зарплата: ");
-                if (double.TryParse(Console.ReadLine(), out salary) && salary > 0)
-                    break;
-                Console.WriteLine("Помилка! Введіть позитивне число.");
-            }
 
             Company company = new Company(companyName, position, salary);
             workers[i] = new Worker(name, year, month, company);
@@ -158,29 +187,22 @@ class Program
     {
         Array.Sort(workers, (x, y) => x.GetWorkExperience().CompareTo(y.GetWorkExperience()));
     }
-
-    static void Main(string[] args)
+    static void GetWorkerData(out Worker[] workers)
     {
-        Console.OutputEncoding = Encoding.Unicode;
-        Console.InputEncoding = Encoding.Unicode;
-
         Console.Write("Введіть кількість працівників: ");
-        int n;
-        while (!int.TryParse(Console.ReadLine(), out n) || n <= 0)
-        {
-            Console.WriteLine("Помилка! Введіть додатне число.");
-        }
-
-        Worker[] workers = ReadWorkersArray(n);
-
-        Console.WriteLine("\nІнформація про працівників:");
+        int n = int.Parse(Console.ReadLine());
+        workers = ReadWorkersArray(n);
+    }
+    static void ShowWorkerInfo(Worker[] workers)
+    {
         PrintWorkers(workers);
-
         double maxSalary, minSalary;
         GetWorkersInfo(workers, out maxSalary, out minSalary);
         Console.WriteLine("\nМаксимальна зарплата: {0}", maxSalary);
         Console.WriteLine("Мінімальна зарплата: {0}", minSalary);
-
+    }
+    static void SortAndPrintWorkers(Worker[] workers)
+    {
         SortWorkerBySalary(ref workers);
         Console.WriteLine("\nСортування працівників за зарплатою:");
         PrintWorkers(workers);
@@ -189,4 +211,16 @@ class Program
         Console.WriteLine("\nСортування працівників за стажем роботи:");
         PrintWorkers(workers);
     }
+
+    static void Main(string[] args)
+    {
+        Console.OutputEncoding = Encoding.Unicode;
+        Console.InputEncoding = Encoding.Unicode;
+
+        Worker[] workers;
+        GetWorkerData(out workers);
+        ShowWorkerInfo(workers);
+        SortAndPrintWorkers(workers);
+    }
+
 }
