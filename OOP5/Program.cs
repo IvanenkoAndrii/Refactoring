@@ -150,29 +150,22 @@ class Program
     {
         Array.Sort(workers, (x, y) => x.GetWorkExperience().CompareTo(y.GetWorkExperience()));
     }
-
-    static void Main(string[] args)
+    static void GetWorkerData(out Worker[] workers)
     {
-        Console.OutputEncoding = Encoding.Unicode;
-        Console.InputEncoding = Encoding.Unicode;
-
         Console.Write("Введіть кількість працівників: ");
-        int n;
-        while (!int.TryParse(Console.ReadLine(), out n) || n <= 0)
-        {
-            Console.WriteLine("Помилка! Введіть додатне число.");
-        }
-
-        Worker[] workers = ReadWorkersArray(n);
-
-        Console.WriteLine("\nІнформація про працівників:");
+        int n = int.Parse(Console.ReadLine());
+        workers = ReadWorkersArray(n);
+    }
+    static void ShowWorkerInfo(Worker[] workers)
+    {
         PrintWorkers(workers);
-
         double maxSalary, minSalary;
         GetWorkersInfo(workers, out maxSalary, out minSalary);
         Console.WriteLine("\nМаксимальна зарплата: {0}", maxSalary);
         Console.WriteLine("Мінімальна зарплата: {0}", minSalary);
-
+    }
+    static void SortAndPrintWorkers(Worker[] workers)
+    {
         SortWorkerBySalary(ref workers);
         Console.WriteLine("\nСортування працівників за зарплатою:");
         PrintWorkers(workers);
@@ -181,4 +174,16 @@ class Program
         Console.WriteLine("\nСортування працівників за стажем роботи:");
         PrintWorkers(workers);
     }
+
+    static void Main(string[] args)
+    {
+        Console.OutputEncoding = Encoding.Unicode;
+        Console.InputEncoding = Encoding.Unicode;
+
+        Worker[] workers;
+        GetWorkerData(out workers);
+        ShowWorkerInfo(workers);
+        SortAndPrintWorkers(workers);
+    }
+
 }
