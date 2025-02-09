@@ -4,10 +4,10 @@ using System.Text;
 
 class Worker
 {
-    public string FullName { get; set; } // Назва змінина на більш змістовну
-    public int StartYear { get; set; } // Назва змінина на більш змістовну
-    public int StartMonth { get; set; } // Назва змінина на більш змістовну
-    public Company Employer { get; set; } 
+    public string FullName { get; set; } // Назва змінна на більш змістовну
+    public int StartYear { get; set; } // Назва змінна на більш змістовну
+    public int StartMonth { get; set; } // Назва змінна на більш змістовну
+    public Company Employer { get; set; } // Змінив WorkPlace на Employer для більшого сенсу
 
     private const int MinYearOfEmployment = 1900; // Змінив MinYear на MinYearOfEmployment
 
@@ -59,8 +59,8 @@ class Worker
 
 class Company
 {
-    public string CompanyName { get; set; } 
-    public string JobTitle { get; set; } 
+    public string CompanyName { get; set; } // Назва змінна на більш змістовну
+    public string JobTitle { get; set; } // Назва змінна на більш змістовну
     public double Salary { get; set; }
 
     public Company()
@@ -87,20 +87,44 @@ class Company
 
 class Program
 {
-    
+    // Методи для валідації введених даних
     public static int GetValidYear()
     {
-       
+        int year;
+        while (true)
+        {
+            Console.Write("Введіть рік початку роботи: ");
+            if (int.TryParse(Console.ReadLine(), out year) && year >= 1900 && year <= DateTime.Now.Year)
+                break;
+            Console.WriteLine("Помилка! Введіть коректний рік.");
+        }
+        return year;
     }
 
     public static int GetValidMonth()
     {
-        
+        int month;
+        while (true)
+        {
+            Console.Write("Введіть місяць початку роботи: ");
+            if (int.TryParse(Console.ReadLine(), out month) && month >= 1 && month <= 12)
+                break;
+            Console.WriteLine("Помилка! Введіть число від 1 до 12.");
+        }
+        return month;
     }
 
     public static double GetValidSalary()
     {
-       
+        double salary;
+        while (true)
+        {
+            Console.Write("Введіть зарплату: ");
+            if (double.TryParse(Console.ReadLine(), out salary) && salary > 0)
+                break;
+            Console.WriteLine("Помилка! Введіть позитивне число.");
+        }
+        return salary;
     }
 
     public static Worker[] ReadWorkersData(int numberOfWorkers)
@@ -148,7 +172,7 @@ class Program
         Console.OutputEncoding = Encoding.Unicode;
         Console.InputEncoding = Encoding.Unicode;
 
-        Worker[] workers = ReadWorkersData(3); 
+        Worker[] workers = ReadWorkersData(3); // Введення 3 працівників
         SortAndDisplayWorkersBy(w => w.CalculateWorkExperience(), workers);
     }
 }
