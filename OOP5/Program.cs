@@ -4,10 +4,10 @@ using System.Text;
 
 class Worker
 {
-    protected string Name;
-    protected int Year;
-    protected int Month;
-    protected Company WorkPlace;
+    public string Name { get; set; }
+    public int Year { get; set; }
+    public int Month { get; set; }
+    public Company WorkPlace { get; set; }
 
     public Worker()
     {
@@ -33,16 +33,6 @@ class Worker
         WorkPlace = new Company(other.WorkPlace);
     }
 
-    public void SetName(string name) => Name = name;
-    public void SetYear(int year) => Year = year;
-    public void SetMonth(int month) => Month = month;
-    public void SetWorkPlace(Company company) => WorkPlace = company;
-
-    public string GetName() => Name;
-    public int GetYear() => Year;
-    public int GetMonth() => Month;
-    public Company GetWorkPlace() => WorkPlace;
-
     public int GetWorkExperience()
     {
         DateTime currentDate = DateTime.Now;
@@ -50,14 +40,14 @@ class Worker
         return totalMonths;
     }
 
-    public double GetTotalMoney() => WorkPlace.GetSalary() * GetWorkExperience();
+    public double GetTotalMoney() => WorkPlace.Salary * GetWorkExperience();
 }
 
 class Company
 {
-    protected string Name;
-    protected string Position;
-    protected double Salary;
+    public string Name { get; set; }
+    public string Position { get; set; }
+    public double Salary { get; set; }
 
     public Company()
     {
@@ -79,14 +69,6 @@ class Company
         Position = other.Position;
         Salary = other.Salary;
     }
-
-    public void SetName(string name) => Name = name;
-    public void SetPosition(string position) => Position = position;
-    public void SetSalary(double salary) => Salary = salary;
-
-    public string GetName() => Name;
-    public string GetPosition() => Position;
-    public double GetSalary() => Salary;
 }
 
 class Program
@@ -94,36 +76,62 @@ class Program
     public static Worker[] ReadWorkersArray(int n)
     {
         Worker[] workers = new Worker[n];
+
         for (int i = 0; i < n; i++)
         {
-            Console.WriteLine("Введіть дані про працівника {0}:", i + 1);
+            Console.WriteLine($"Введіть дані про працівника {i + 1}:");
+
             Console.Write("Прізвище та ініціали: ");
             string name = Console.ReadLine();
-            Console.Write("Рік початку роботи: ");
-            int year = Convert.ToInt32(Console.ReadLine());
-            Console.Write("Місяць початку роботи: ");
-            int month = Convert.ToInt32(Console.ReadLine());
+
+            int year;
+            while (true)
+            {
+                Console.Write("Рік початку роботи: ");
+                if (int.TryParse(Console.ReadLine(), out year) && year > 1900 && year <= DateTime.Now.Year)
+                    break;
+                Console.WriteLine("Помилка! Введіть коректний рік (не раніше 1900 і не пізніше поточного року).");
+            }
+
+            int month;
+            while (true)
+            {
+                Console.Write("Місяць початку роботи: ");
+                if (int.TryParse(Console.ReadLine(), out month) && month >= 1 && month <= 12)
+                    break;
+                Console.WriteLine("Помилка! Введіть число від 1 до 12.");
+            }
+
             Console.Write("Назва компанії: ");
             string companyName = Console.ReadLine();
+
             Console.Write("Посада: ");
             string position = Console.ReadLine();
-            Console.Write("Зарплата: ");
-            double salary = Convert.ToDouble(Console.ReadLine());
+
+            double salary;
+            while (true)
+            {
+                Console.Write("Зарплата: ");
+                if (double.TryParse(Console.ReadLine(), out salary) && salary > 0)
+                    break;
+                Console.WriteLine("Помилка! Введіть позитивне число.");
+            }
 
             Company company = new Company(companyName, position, salary);
             workers[i] = new Worker(name, year, month, company);
         }
+
         return workers;
     }
 
     public static void PrintWorker(Worker worker)
     {
-        Console.WriteLine("Прізвище та ініціали: {0}", worker.GetName());
+        Console.WriteLine("Прізвище та ініціали: {0}", worker.Name);
         Console.WriteLine("Стаж роботи: {0} місяців", worker.GetWorkExperience());
         Console.WriteLine("Загальна сума зароблених коштів: {0}", worker.GetTotalMoney());
-        Console.WriteLine("Назва компанії: {0}", worker.GetWorkPlace().GetName());
-        Console.WriteLine("Посада: {0}", worker.GetWorkPlace().GetPosition());
-        Console.WriteLine("Зарплата: {0}", worker.GetWorkPlace().GetSalary());
+        Console.WriteLine("Назва компанії: {0}", worker.WorkPlace.Name);
+        Console.WriteLine("Посада: {0}", worker.WorkPlace.Position);
+        Console.WriteLine("Зарплата: {0}", worker.WorkPlace.Salary);
     }
 
     public static void PrintWorkers(Worker[] workers)
@@ -137,13 +145,13 @@ class Program
 
     public static void GetWorkersInfo(Worker[] workers, out double maxSalary, out double minSalary)
     {
-        maxSalary = workers.Max(w => w.GetWorkPlace().GetSalary());
-        minSalary = workers.Min(w => w.GetWorkPlace().GetSalary());
+        maxSalary = workers.Max(w => w.WorkPlace.Salary);
+        minSalary = workers.Min(w => w.WorkPlace.Salary);
     }
 
     public static void SortWorkerBySalary(ref Worker[] workers)
     {
-        Array.Sort(workers, (x, y) => y.GetWorkPlace().GetSalary().CompareTo(x.GetWorkPlace().GetSalary()));
+        Array.Sort(workers, (x, y) => y.WorkPlace.Salary.CompareTo(x.WorkPlace.Salary));
     }
 
     public static void SortWorkerByWorkExperience(ref Worker[] workers)
@@ -157,7 +165,12 @@ class Program
         Console.InputEncoding = Encoding.Unicode;
 
         Console.Write("Введіть кількість працівників: ");
-        int n = Convert.ToInt32(Console.ReadLine());
+        int n;
+        while (!int.TryParse(Console.ReadLine(), out n) || n <= 0)
+        {
+            Console.WriteLine("Помилка! Введіть додатне число.");
+        }
+
         Worker[] workers = ReadWorkersArray(n);
 
         Console.WriteLine("\nІнформація про працівників:");
